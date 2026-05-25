@@ -1,0 +1,41 @@
+name: "AI Code Reviewer"
+description: "Reviews pull requests using Claude AI and posts inline comments"
+
+# these are the inputs users pass in their workflow file
+# they automatically become environment variables inside the container
+inputs:
+  anthropic-api-key:
+    description: "Anthropic API key for Claude"
+    required: true
+  github-token:
+    description: "GitHub token to post review comments"
+    required: true
+    default: ${{ github.token }}  # GitHub provides this automatically, user doesn't need to set it
+  model:
+    description: "Claude model to use"
+    required: false
+    default: "claude-sonnet-4-6"
+  max-files:
+    description: "Max number of files to review — keeps token usage sane on huge PRs"
+    required: false
+    default: "10"
+
+# this tells GitHub how to actually run the action
+# "docker" means it builds my Dockerfile and runs it as a container
+# the alternative is "node20" but I'm using Python so Docker makes more sense
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    # mapping each input to an env var my Python script can read
+    ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+    CLAUDE_MODEL: ${{ inputs.model }}
+    MAX_FILES: ${{ inputs.max-files }}
+    # GitHub injects these automatically — I need them to know which repo/PR we're on
+    GITHUB_REPOSITORY: ${{ github.repository }}
+    GITHUB_EVENT_PATH: ${{ github.event_path }}
+
+branding:
+  icon: "code"
+  color: "purple"

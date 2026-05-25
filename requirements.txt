@@ -1,0 +1,2 @@
+anthropic>=0.40.0      # Claude API SDK
+PyGithub>=2.1.1        # GitHub REST API wrapper — cleaner than raw requests
